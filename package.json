@@ -1,0 +1,12 @@
+{
+  "name": "micro-services-practice",
+  "private": true,
+  "workspaces": [
+    "gateway",
+    "user-service",
+    "job-service"
+  ],
+  "scripts": {
+    "dev": "docker-compose up --build"
+  }
+}
