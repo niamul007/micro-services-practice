@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: userservice
     ports:
       - "5433:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
 
   job-db:
     image: postgres:15
@@ -18,3 +20,42 @@ services:
       POSTGRES_DB: jobservice
     ports:
       - "5434:5432"
+    volumes:
+      - job_db_data:/var/lib/postgresql/data
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@user-db:5432/userservice
+      PORT: 3001
+      JWT_SECRET: your_jwt_secret_key
+    depends_on:
+      - user-db
+    volumes:
+      - ./user-service/src:/app/src
+
+  job-service:
+    build:
+      context: ./job-service
+      dockerfile: Dockerfile
+    container_name: job-service
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@job-db:5432/jobservice
+      PORT: 3002
+      JWT_SECRET: your_jwt_secret_key
+      USER_SERVICE_URL: http://user-service:3001
+    depends_on:
+      - job-db
+    volumes:
+      - ./job-service/src:/app/src
+
+volumes:
+  user_db_data:
+  job_db_data:
