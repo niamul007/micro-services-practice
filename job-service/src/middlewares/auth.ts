@@ -12,11 +12,14 @@ export const authMiddleware = async (
     if (!auth) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const response = await axios.get("http://localhost:3001/api/auth/verify", {
-      headers: {
-        Authorization: auth
-      }
-    });
+    const response = await axios.get(
+      `${process.env.USER_SERVICE_URL}/api/auth/verify`,
+      {
+        headers: {
+          Authorization: auth,
+        },
+      },
+    );
     // attach user info to request object for downstream handlers — avoids redundant token verification
     (req as any).user = response.data.user;
     next();

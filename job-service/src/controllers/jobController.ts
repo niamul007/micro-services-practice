@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../config/prisma";
+import redisClient from "../config/redis";
 
 export const createJob = async (req: Request, res: Response) => {
   // extract job details from request body and user ID from auth middleware
@@ -13,6 +14,8 @@ export const createJob = async (req: Request, res: Response) => {
   const newJob = { title, description, location, type, userId };
   // return the created job in response (in real app, consider stripping sensitive info or using a DTO)
   const job = await (prisma as any).job.create({ data: newJob });
+  // cache the created job in Redis
+  await redisClient.publish("jobCreated", JSON.stringify(job));
   return res.status(201).json({ message: "Job created successfully", job });
 };
 
