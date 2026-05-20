@@ -1,0 +1,7 @@
+user-service:
+  environment:
+    REDIS_HOST: redis
+    
+job-service:
+  environment:
+    REDIS_HOST: redis
