@@ -1,6 +1,9 @@
-version: '3.8'
-
 services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
   user-db:
     image: postgres:15
     environment:
@@ -34,8 +37,10 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@user-db:5432/userservice
       PORT: 3001
       JWT_SECRET: your_jwt_secret_key
+      REDIS_HOST: redis
     depends_on:
       - user-db
+      - redis
     volumes:
       - ./user-service/src:/app/src
 
@@ -51,8 +56,10 @@ services:
       PORT: 3002
       JWT_SECRET: your_jwt_secret_key
       USER_SERVICE_URL: http://user-service:3001
+      REDIS_HOST: redis
     depends_on:
       - job-db
+      - redis
     volumes:
       - ./job-service/src:/app/src
 
