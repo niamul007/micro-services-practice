@@ -52,6 +52,24 @@ app.use("/api/jobs", async (req: Request, res: Response) => {
   }
 });
 
+app.use("/api/notifications", async (req: Request, res: Response) => {
+  try {
+    const url = `${USER_SERVICE}${req.originalUrl}`;
+    const response = await axios({
+      method: req.method,
+      url,
+      data: req.body,
+      headers: {
+        "Content-Type": "application/json",
+        ...(req.headers.authorization && { Authorization: req.headers.authorization })
+      }
+    });
+    res.status(response.status).json(response.data);
+  } catch (err: any) {
+    res.status(err.response?.status || 500).json(err.response?.data || { message: "Gateway error" });
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("Hello from API Gateway!");
 });
