@@ -52,16 +52,22 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install and test user-service
+      - name: Install build and test user-service
         working-directory: user-service
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5433/userservice
           JWT_SECRET: bitwarden
           REDIS_HOST: localhost
+          PORT: 3001
         run: |
           npm install
           npx prisma migrate deploy
+          npm run build
           npm test
+          node dist/index.js &
+
+      - name: Wait for user-service to start
+        run: sleep 5
 
       - name: Install and test job-service
         working-directory: job-service
@@ -70,6 +76,7 @@ jobs:
           JWT_SECRET: bitwarden
           REDIS_HOST: localhost
           USER_SERVICE_URL: http://localhost:3001
+          PORT: 3002
         run: |
           npm install
           npx prisma migrate deploy
